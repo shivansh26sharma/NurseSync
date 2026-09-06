@@ -1,3 +1,4 @@
+
 # NurseSync AI
 
 Intelligent audio-based clinical handoff system. See `docs/proposal.docx` (or your submitted proposal) for the full project description.
@@ -95,3 +96,7 @@ Check the **Actions** tab on GitHub after pushing — the CI workflow should run
 ## Safety note
 
 Uses synthetic/de-identified data only. The system is decision-support (summarization, retrieval, experimental risk scoring) — it does not diagnose or make autonomous clinical decisions.
+
+# NurseSync
+A full-stack healthcare management system for improving nurse-patient coordination.
+

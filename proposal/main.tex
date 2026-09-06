@@ -1,0 +1,524 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\textbf{NurseSync AI}
+
+\textbf{Intelligent Audio-Based Clinical Handoff System}
+
+Project Proposal for UCS503P
+
+Submitted to: Dr. Asif
+
+\textbf{Thapar Institute of Engineering and Technology}
+
+Shivansh Sharma( Roll No: 1024030732 )
+
+Ishaan Bhalla( Roll No: 1024030950 )
+
+Pushp Batheja( Roll No: 1024030941 )
+
+August 15, 2026
+
+\section{1 Higher-order goal}\label{higher-order-goal}
+
+This project aims to improve patient safety and continuity of care by
+reducing the time, inconsistency, and error rate involved in
+nurse-to-nurse clinical handoffs. While the underlying goal --- safer,
+more reliable communication of patient information --- is broader than
+any single application, the immediate engineering objective is to
+translate structured, accurate handoff documentation into a measurable,
+deployable software solution: a system that lets a nurse speak a handoff
+and converts that speech into structured, searchable, and auditable
+clinical records.
+
+\section{2 Time-to-value}\label{time-to-value}
+
+\begin{itemize}
+\item
+  We will deliver meaningful increments quickly by building the core
+  patient/handoff workflow (login, patient list, patient profile,
+  structured handoff storage) before adding any AI/ML capability.
+\item
+  We will prioritize fast feedback over perfection by following a staged
+  roadmap --- development environment, backend, database, patient
+  system, mobile frontend, audio capture, speech-to-text, NLP
+  extraction, summary/timeline, RAG assistant, ML risk model, testing,
+  deployment --- validating each stage before moving to the next.
+\item
+  Success in the first iteration is defined narrowly: a nurse can log
+  in, view a patient, and create and retrieve a structured (even if
+  manually entered) handoff record. AI/ML layers are added incrementally
+  on top of this working core.
+\end{itemize}
+
+\section{3 Problem Statement}\label{problem-statement}
+
+Nurses routinely hand off patient information verbally or in free-text
+notes at the end of a shift --- for example, describing a
+patient\textquotesingle s diagnosis, vitals, medications administered,
+and pending tests in a single spoken narrative. Reports indicate nurses
+can spend a substantial share of a shift on manual charting, time taken
+directly from patient care. Common pain points include:
+
+\begin{itemize}
+\item
+  \textbf{Fragmentation:} handoff information is typed manually, spread
+  across multiple notes, or communicated purely verbally, causing
+  details to be lost or inconsistently recorded.
+\item
+  \textbf{Inconsistent structure:} different nurses document
+  differently, making handoffs harder to scan quickly during a busy
+  shift change.
+\item
+  \textbf{Poor searchability:} once written, information is difficult to
+  search or retrieve later (e.g., "what was this
+  patient\textquotesingle s oxygen level this morning?").
+\item
+  \textbf{Handoff errors:} incomplete or misinterpreted information
+  during nurse-to-nurse handoffs is a recognized contributor to
+  preventable medical errors and missed critical details.
+\item
+  \textbf{Accountability gaps:} without reliable, time-stamped records,
+  it is difficult to reconstruct exactly what happened and when during a
+  patient\textquotesingle s care.
+\end{itemize}
+
+Why this matters now (contextual relevance): On a busy ward, even small
+improvements in how quickly and accurately information is captured and
+transferred can meaningfully reduce missed or delayed care.
+
+\section{}\label{section}
+
+\section{4 Proposed Solution}\label{proposed-solution}
+
+\subsection{4.1 Overview}\label{overview}
+
+Build a mobile-first "speak-to-structured-handoff" system with the
+following components:
+
+\begin{itemize}
+\item
+  \textbf{Voice handoff capture:} a nurse records a spoken handoff for a
+  specific patient instead of typing it.
+\item
+  \textbf{Speech-to-text:} the recorded audio is transcribed to a text
+  transcript.
+\item
+  \textbf{Medical entity extraction (NLP):} the transcript is parsed
+  into structured fields --- diagnosis, medications, vitals, allergies,
+  tests, and events.
+\item
+  \textbf{Structured SBAR handoff + AI summary:} extracted information
+  is organized into a standard
+  Situation/Background/Assessment/Recommendation format and a short,
+  scannable summary.
+\item
+  \textbf{Timeline generator:} every extracted event (medication given,
+  vitals recorded, test ordered) becomes a timestamped entry in a
+  longitudinal patient timeline.
+\item
+  \textbf{Missing-information detection:} the system checks a handoff
+  against an expected field set (diagnosis, vitals, allergies, pending
+  tests, recommendation) and flags gaps.
+\item
+  \textbf{RAG-grounded AI assistant:} nurses can ask natural-language
+  questions about a patient ("what changed today?") and receive answers
+  grounded strictly in that patient\textquotesingle s stored records.
+\item
+  \textbf{Experimental risk model:} a machine-learning classifier
+  estimates deterioration risk (low/medium/high) from structured vitals,
+  with an explanation of contributing factors.
+\end{itemize}
+
+\subsection{4.2 Core workflow}\label{core-workflow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Nurse selects a patient and taps "Record Handoff."
+\item
+  Nurse speaks the handoff naturally; audio is recorded and uploaded.
+\item
+  Backend transcribes the audio, extracts medical entities and events,
+  and generates an SBAR handoff, a concise summary, and timeline
+  entries.
+\item
+  The completeness checker flags any missing required fields, and the
+  risk model (where applicable) scores deterioration risk from
+  structured vitals.
+\item
+  Everything is stored; the next nurse opens the patient and sees the
+  summary, timeline, risk indicator, full handoff history, and can query
+  the AI assistant.
+\end{enumerate}
+
+\subsection{4.3 Operational constraints and safety
+boundaries}\label{operational-constraints-and-safety-boundaries}
+
+\begin{itemize}
+\item
+  Keep the mobile app usable hands-free at the bedside, on standard
+  hospital devices.
+\item
+  The system provides AI-assisted organization, summarization,
+  retrieval, and experimental risk prediction to support the handoff
+  workflow --- it does not diagnose patients or make autonomous clinical
+  decisions. The nurse remains responsible for verifying all
+  information.
+\item
+  RAG answers must be grounded in retrieved patient records; the
+  assistant should not generate unsupported clinical claims.
+\item
+  For this student prototype, use synthetic or de-identified patient
+  data rather than real patient recordings.
+\end{itemize}
+
+\section{}\label{section-1}
+
+\section{5 Solution Approach}\label{solution-approach}
+
+This is a software engineering project with an applied-AI component, so
+the emphasis is on integrating mature, existing AI/ML components into a
+correct, well-tested pipeline --- rather than researching new model
+architectures.
+
+\subsection{5.1 AI/ML component integration
+\ldots non-research}\label{aiml-component-integration-non-research}
+
+\begin{itemize}
+\item
+  \textbf{Speech-to-text:} use an existing pretrained model (e.g.,
+  Whisper) rather than training a speech model from scratch.
+\item
+  \textbf{Entity extraction \& summarization:} use an LLM/NLP pipeline
+  via prompting or lightweight fine-tuning to pull structured fields out
+  of transcripts and produce the SBAR/summary text.
+\item
+  \textbf{RAG question answering:} chunk and embed patient records,
+  retrieve the most relevant records for a given question, and pass only
+  that retrieved context to the LLM so answers stay grounded in stored
+  data instead of being generated freely.
+\item
+  \textbf{Missing-information detection:} start as a rules + NLP check
+  against an expected field checklist; consider a trained classifier
+  later only if a suitable labeled dataset becomes available.
+\item
+  \textbf{Risk classification:} compare established, well-understood
+  models --- Logistic Regression, Random Forest, XGBoost --- rather than
+  assuming one is best, and report feature-level contributions
+  (explainability) alongside each prediction.
+\end{itemize}
+
+\subsection{\texorpdfstring{5.2 Mobile / backend architecture
+}{5.2 Mobile / backend architecture }}\label{mobile-backend-architecture}
+
+\begin{itemize}
+\item
+  \textbf{Frontend:} a Flutter mobile app covering login, dashboard,
+  patient list, patient profile, audio recorder, timeline view, and AI
+  assistant chat.
+\item
+  \textbf{Backend API:} FastAPI service exposing endpoints such as
+  /login, /patients, /handoffs, /handoffs/\{id\}/process,
+  /patients/\{id\}/timeline, /patients/\{id\}/ask, and
+  /patients/\{id\}/risk.
+\item
+  \textbf{Database:} PostgreSQL storing Patient, Handoff, Vitals,
+  Medication, Timeline, and Risk tables with clear relations back to
+  each patient.
+\end{itemize}
+
+\subsection{5.3 CI/CD and fast delivery
+enabler}\label{cicd-and-fast-delivery-enabler}
+
+\begin{itemize}
+\item
+  Automatically build and run backend unit tests and linting on every
+  change.
+\item
+  Produce repeatable deployment artifacts to a staging environment.
+\item
+  Enable safe, frequent releases of each incremental stage in the
+  roadmap (backend → database → patient system → mobile app → audio →
+  speech AI → NLP → summary/timeline → RAG → ML → testing → deployment).
+\end{itemize}
+
+\section{6 Evaluation Criterion}\label{evaluation-criterion}
+
+We define success using measurable metrics tied to the core workflow.
+
+\subsection{6.1 Primary evaluation
+metric}\label{primary-evaluation-metric}
+
+Handoff Documentation Time (HDT): time from the start of voice recording
+to a fully structured, stored handoff record (transcript + SBAR +
+summary + timeline entries).
+
+\begin{itemize}
+\item
+  Target: median HDT well below the time required to manually type an
+  equivalent handoff, measured in a small user study.
+\item
+  Attribution: measured from timestamps logged at recording start and at
+  the handoff-stored event in the database.
+\end{itemize}
+
+\subsection{6.2 Secondary evaluation
+metrics}\label{secondary-evaluation-metrics}
+
+\begin{itemize}
+\item
+  \textbf{Entity extraction accuracy:} precision/recall/F1 of extracted
+  fields (diagnosis, medication, vitals, allergy, tests) against
+  manually labeled transcripts.
+\item
+  \textbf{Completeness-detection accuracy:} precision/recall of the
+  missing-information checker against handoffs with intentionally
+  omitted fields.
+\item
+  \textbf{RAG answer groundedness:} proportion of AI assistant answers
+  that are fully supported by the retrieved patient records, reviewed
+  manually on a test set of questions.
+\item
+  \textbf{Risk model performance:} accuracy, precision, recall, F1, and
+  ROC-AUC, with particular attention to recall/sensitivity and false
+  negatives given the medical stakes.
+\item
+  \textbf{Nurse-reported usability:} clarity and usefulness of
+  summaries/timeline using a simple 1--5 feedback question.
+\item
+  \textbf{Reliability:} availability of the staging/production API
+  during testing sessions.
+\end{itemize}
+
+\subsection{6.3 Pilot validation plan
+}\label{pilot-validation-plan-high-level}
+
+\begin{itemize}
+\item
+  Recruit a small group of nursing students or clinically-informed
+  volunteers (e.g., 5--10) to record handoffs for synthetic patient
+  scenarios.
+\item
+  Compare structured-handoff creation time against a manual-typing
+  baseline for the same scenarios.
+\item
+  Collect qualitative feedback on summary/timeline usefulness,
+  missing-information flags, and AI assistant answer quality.
+\end{itemize}
+
+\section{7 Scalability}\label{scalability}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Scalable (theoretically):} the system should support growth in
+  number of patients, handoffs, and concurrent app usage by:
+
+  \begin{itemize}
+  \item
+    decoupling the Flutter frontend from the FastAPI backend,
+  \item
+    using a stateless REST API design,
+  \item
+    indexing and paginating common queries (patient lists, timelines),
+  \item
+    processing audio transcription asynchronously (queue-based) so
+    long-running AI jobs don\textquotesingle t block the API.
+  \end{itemize}
+\item
+  \textbf{Operationally deployable (practically):} the system should run
+  on common infrastructure:
+
+  \begin{itemize}
+  \item
+    a managed PostgreSQL database,
+  \item
+    containerized backend deployment,
+  \item
+    a CI/CD pipeline for staging/production,
+  \item
+    a vector store for RAG retrieval that can scale independently of the
+    relational database.
+  \end{itemize}
+\end{enumerate}
+
+\section{8 Engine availability
+heuristic}\label{engine-availability-heuristic}
+
+A mature set of "engines" (tooling/services) is available to implement
+this project without inventing new infrastructure or model
+architectures:
+
+\begin{itemize}
+\item
+  Speech-to-text engine (e.g., Whisper) for audio → transcript.
+\item
+  Hosted or open-source LLM for entity extraction, SBAR structuring,
+  summarization, and RAG-based answer generation.
+\item
+  Embedding + vector search library for retrieval-augmented generation.
+\item
+  FastAPI as the REST framework; Flutter as the cross-platform mobile
+  framework.
+\item
+  Managed PostgreSQL for relational storage.
+\item
+  Token-based authentication (e.g., JWT).
+\item
+  Object storage for audio files.
+\item
+  scikit-learn / XGBoost for risk classification experiments.
+\item
+  pytest for backend unit/integration tests; a CI runner and staging
+  deployment target.
+\end{itemize}
+
+We will use these mature components to focus on pipeline design, data
+structuring, correctness, and clinical-safety framing rather than
+building new infrastructure or novel model architectures.
+
+\section{9 Project scope and
+deliverables}\label{project-scope-and-deliverables}
+
+\subsection{9.1 Initial deliverable \ldots first
+iteration}\label{initial-deliverable-first-iteration}
+
+\begin{itemize}
+\item
+  Login/authentication and a Flutter app shell connected to the FastAPI
+  backend.
+\item
+  Patient list and patient profile screens backed by a PostgreSQL schema
+  (Patient, Handoff, Vitals, Medication, Timeline, Risk).
+\item
+  Manual handoff entry and retrieval (structured fields, no AI yet), to
+  validate the core data model end to end.
+\item
+  CI: build + backend unit tests + linting.
+\item
+  CD to staging.
+\end{itemize}
+
+\subsection{9.2 Subsequent deliverables}\label{subsequent-deliverables}
+
+\begin{itemize}
+\item
+  Audio recording, upload, and storage.
+\item
+  Whisper-based speech-to-text integration.
+\item
+  Medical NLP entity extraction feeding an auto-generated SBAR handoff
+  and AI summary.
+\item
+  Automatic timeline generation from extracted events.
+\item
+  Missing-information / completeness checker.
+\item
+  RAG-based AI assistant for patient-specific question answering.
+\item
+  Experimental ML deterioration risk model with explainability, plus
+  expanded testing and deployment.
+\end{itemize}
+
+\section{}\label{section-2}
+
+\section{10 Risks and mitigations}\label{risks-and-mitigations}
+
+\begin{itemize}
+\item
+  \textbf{Patient data privacy/consent:} use only synthetic or
+  de-identified data for the prototype; no real patient recordings; plan
+  for stronger safeguards (access control, audit logs) before any real
+  deployment.
+\item
+  \textbf{Overclaiming AI capability:} explicitly label the risk model
+  and summaries as decision-support, not diagnosis; keep the nurse
+  responsible for verification; constrain RAG answers to retrieved
+  records to avoid hallucination.
+\item
+  \textbf{Speech recognition accuracy in clinical/noisy settings:}
+  evaluate transcription quality on medical vocabulary; give the nurse a
+  quick review/correction step before a handoff is finalized.
+\item
+  \textbf{False negatives in risk prediction:} prioritize
+  recall/sensitivity over raw accuracy; tune thresholds; keep a human in
+  the loop for any high-risk flag.
+\item
+  \textbf{Staff adoption:} keep the voice-recording workflow faster than
+  typing; make structured output easy to review and edit; minimize extra
+  steps versus current practice.
+\item
+  \textbf{Scope creep across many AI/ML stages:} follow the staged
+  roadmap and ship each stage (backend → database → frontend → audio →
+  speech AI → NLP → summary/timeline → RAG → ML → testing → deployment)
+  as a working increment before starting the next.
+\end{itemize}
+
+\section{11 Summary}\label{summary}
+
+NurseSync AI proposes a deployable, voice-driven clinical handoff system
+that converts spoken nurse-to-nurse handoffs into structured,
+timestamped, and searchable clinical records, augmented with AI
+summarization, automatic timeline generation, missing-information
+detection, and a RAG-grounded assistant for patient-specific question
+answering. An experimental, explainable ML deterioration-risk model adds
+a decision-support layer without replacing clinical judgment. The
+project emphasizes engineering integration of mature, existing AI/ML
+components, incremental delivery through CI/CD, and measurable
+evaluation --- handoff documentation time, extraction accuracy, and
+risk-model recall --- while maintaining clear safety boundaries: the
+system organizes, summarizes, and retrieves information to support the
+nurse, and does not diagnose or make autonomous care decisions.
+
+\end{document}
