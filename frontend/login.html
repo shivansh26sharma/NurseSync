@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NurseSync AI — Login</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="brand"><span class="dot"></span>NurseSync AI</div>
+      <div class="tagline">Speak. Sync. Care.</div>
+
+      <form onsubmit="window.location.href='dashboard.html'; return false;">
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" placeholder="sarah@hospital.org" value="sarah@hospital.org">
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" value="password">
+        </div>
+        <button class="btn primary full" type="submit">Login</button>
+      </form>
+
+      <div class="login-note">Demo screen — no real authentication yet (Week 2).</div>
+    </div>
+  </div>
+</body>
+</html>
