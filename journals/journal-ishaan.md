@@ -37,7 +37,7 @@
 - Set up the FastAPI application that hosts the project's speech-to-text service, establishing the app structure, configuration, and CORS setup needed for the frontend to call it during development.
 - Integrated the **faster-whisper** model for transcription, running it locally on CPU with int8 quantisation to keep it performant without a GPU.
 - Chose a local model deliberately over a hosted transcription API: it requires no API key, incurs no per-request cost, and works fully offline once the model is cached — which matters for a hospital ward with unreliable connectivity.
-- Confirmed the model's multilingual capability, covering English, Hindi, Punjabi, Tamil, Telugu, and Bengali with no additional setup, so the system suits a real Indian clinical setting.
+- Confirmed the model's multilingual capability, covering English, Hindi (in progress) with no additional setup, so the system suits a real Indian clinical setting.
 
 ## Week 6 (Sep 7 - Sep 13): End-to-End Testing & Verification
 
