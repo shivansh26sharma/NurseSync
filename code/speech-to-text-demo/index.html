@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NurseSync AI — John Smith</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --primary: #4caf7d;
+    --primary-2: #7fd6a8;
+    --primary-dark: #2f9e63;
+    --ink: #0f2a22;
+    --bg: #f4faf6;
+    --card: #ffffff;
+    --text: #1c2b24;
+    --text-muted: #6b8177;
+    --border: #e3f0e8;
+    --red: #e0405a;
+    --red-bg: #fde8ec;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #eaf7ef 0%, #d6f0e0 100%);
+    color: var(--ink);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 18px;
+    margin-bottom: 40px;
+    color: var(--ink);
+  }
+
+  .brand .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    box-shadow: 0 0 0 4px rgba(76, 175, 125, 0.25);
+  }
+
+  .navlinks { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+  .navlinks a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 11px 14px;
+    border-radius: 12px;
+  }
+
+  .navlinks a.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(15, 42, 34, 0.1);
+    margin-top: 12px;
+    padding-top: 16px;
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+
+  .page {
+    flex: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 44px 36px 60px;
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, #eafaf0, #cdeeda);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 30px 30px 26px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header .name {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--red-bg);
+    color: var(--red);
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 22px;
+  }
+
+  .profile-grid .label { font-size: 12px; color: var(--text-muted); margin-bottom: 3px; }
+  .profile-grid .value { font-size: 14.5px; font-weight: 700; }
+
+  .action-row { display: flex; gap: 12px; margin-top: 24px; }
+
+  .btn {
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .btn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: white;
+    box-shadow: 0 6px 16px -4px rgba(109, 94, 252, 0.55);
+  }
+
+  .btn.primary.recording {
+    background: linear-gradient(135deg, var(--red), #ff8098);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
+
+  .btn.secondary {
+    background: rgba(255,255,255,0.6);
+    color: var(--ink);
+    border: 1px solid rgba(15, 42, 34, 0.15);
+  }
+
+  #status {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+
+  .section-title { font-size: 16px; font-weight: 700; margin: 0 0 14px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand"><span class="dot"></span>NurseSync AI</div>
+      <div class="navlinks">
+        <a href="#">Dashboard</a>
+        <a href="#" class="active">Patients</a>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">SR</div>
+        Sarah R. — RN
+      </div>
+    </div>
+
+    <div class="page">
+      <div class="profile-header">
+        <div class="name">John Smith</div>
+        <span class="badge">HIGH RISK</span>
+
+        <div class="profile-grid">
+          <div><div class="label">Age</div><div class="value">64</div></div>
+          <div><div class="label">Ward</div><div class="value">ICU</div></div>
+          <div><div class="label">Doctor</div><div class="value">Dr. Williams</div></div>
+          <div><div class="label">Diagnosis</div><div class="value">Pneumonia</div></div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn primary" id="recordBtn">🎤 Record Handoff</button>
+          <button class="btn secondary">Timeline</button>
+          <button class="btn secondary">Ask AI</button>
+        </div>
+        <div id="status"></div>
+      </div>
+
+      <div class="section-title" id="liveTitle" style="display:none;">New handoff (just recorded)</div>
+      <div class="card" id="liveCard" style="display:none;"></div>
+
+      <div class="section-title">Latest handoff</div>
+      <div class="card">
+        Patient condition improving. Oxygen saturation stable at 96%. Ceftriaxone administered at 10:00 AM.
+        Blood pressure dropped briefly to 90/60 around noon but has since recovered. CT scan ordered, results pending.
+        Allergic to penicillin. Continue monitoring overnight.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+
+    let mediaRecorder = null;
+    let chunks = [];
+    let recording = false;
+
+    const recordBtn = document.getElementById('recordBtn');
+    const statusEl = document.getElementById('status');
+    const liveTitle = document.getElementById('liveTitle');
+    const liveCard = document.getElementById('liveCard');
+
+    function setStatus(text, isError) {
+      statusEl.textContent = text || '';
+      statusEl.style.color = isError ? '#e0405a' : '#6b8177';
+    }
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        chunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = handleStop;
+        mediaRecorder.start();
+        recording = true;
+        recordBtn.textContent = '⏹ Stop Recording';
+        recordBtn.classList.add('recording');
+        setStatus('Recording… speak the handoff, then click Stop.');
+      } catch (err) {
+        setStatus('Microphone access denied or unavailable.', true);
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && recording) {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        recording = false;
+        recordBtn.textContent = '🎤 Record Handoff';
+        recordBtn.classList.remove('recording');
+      }
+    }
+
+    async function handleStop() {
+      setStatus('Transcribing…');
+      const blob = new Blob(chunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', blob, 'handoff.webm');
+
+      try {
+        const res = await fetch(`${API_BASE}/transcribe`, { method: 'POST', body: formData });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `server returned ${res.status}`);
+        }
+        const data = await res.json();
+        liveTitle.style.display = 'block';
+        liveCard.style.display = 'block';
+        liveCard.textContent = data.transcript;
+        setStatus('Transcribed successfully.');
+      } catch (err) {
+        setStatus(`Transcription failed: ${err.message}`, true);
+      }
+    }
+
+    recordBtn.addEventListener('click', () => {
+      if (!recording) startRecording();
+      else stopRecording();
+    });
+  </script>
+</body>
+</html>
