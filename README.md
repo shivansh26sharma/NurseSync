@@ -2,7 +2,7 @@
 
 **Speak. Sync. Care.**
 
-A voice-driven nurse shift handoff system. A nurse speaks the handoff out loud at the bedside, the audio is transcribed automatically on the server, and the transcript is returned for review and correction before it is saved.
+A voice-driven nurse shift handoff system. A nurse speaks the handoff out loud at the bedside of the patient, the audio is transcribed automatically on the server, and the transcript is returned for review and correction before it is saved.
 
 Built for **UCS503P — Software Engineering Project**, Thapar Institute of Engineering & Technology, Patiala.
 
