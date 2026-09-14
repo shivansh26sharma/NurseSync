@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NurseSync AI — Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand"><span class="dot"></span>NurseSync AI</div>
+      <div class="navlinks">
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="patients.html">Patients</a>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">SR</div>
+        Sarah R. — RN
+      </div>
+    </div>
+
+    <div class="page">
+      <h1 class="page-title">Good morning, Sarah</h1>
+      <p class="page-sub">Here's what's happening on your ward today.</p>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="value">3</div><div class="label">Today's patients</div></div>
+        <div class="stat-card danger"><div class="value">1</div><div class="label">Critical patients</div></div>
+        <div class="stat-card"><div class="value" id="pendingCount">—</div><div class="label">Pending handoffs</div></div>
+        <div class="stat-card"><div class="value" id="completedCount">—</div><div class="label">Completed handoffs</div></div>
+      </div>
+
+      <div class="section-title">Recent handoffs</div>
+      <div class="card" id="recentHandoffs">
+        <div class="history-empty">No handoffs recorded yet — go to Patients to record one.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Pull real counts from whatever's actually been saved via localStorage
+    // (written by patient.html when a handoff is recorded/saved).
+    const PATIENTS = ["john-smith", "emily-brown", "michael-lee"];
+    let all = [];
+    PATIENTS.forEach((id) => {
+      const raw = localStorage.getItem(`nursesync_handoffs_${id}`);
+      if (raw) {
+        try {
+          JSON.parse(raw).forEach((h) => all.push({ ...h, patientId: id }));
+        } catch (e) {}
+      }
+    });
+    all.sort((a, b) => b.timestamp - a.timestamp);
+
+    document.getElementById('completedCount').textContent = all.length;
+    document.getElementById('pendingCount').textContent = Math.max(0, PATIENTS.length - all.length);
+
+    if (all.length > 0) {
+      const names = { "john-smith": "John Smith", "emily-brown": "Emily Brown", "michael-lee": "Michael Lee" };
+      document.getElementById('recentHandoffs').innerHTML = all.slice(0, 5).map((h) => `
+        <div class="history-item">
+          <div class="meta">
+            <strong>${names[h.patientId] || h.patientId}</strong>
+            <span>${new Date(h.timestamp).toLocaleString()}</span>
+            <span class="lang-tag">${h.language || 'auto'}</span>
+          </div>
+          <div>${h.text}</div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

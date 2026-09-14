@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NurseSync AI — Patient</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand"><span class="dot"></span>NurseSync AI</div>
+      <div class="navlinks">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html" class="active">Patients</a>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">SR</div>
+        Sarah R. — RN
+      </div>
+    </div>
+
+    <div class="page">
+      <div class="profile-header">
+        <div class="name" id="patientName">—</div>
+        <span class="badge" id="patientBadge"></span>
+
+        <div class="profile-grid">
+          <div><div class="label">Age</div><div class="value" id="patientAge">—</div></div>
+          <div><div class="label">Ward</div><div class="value" id="patientWard">—</div></div>
+          <div><div class="label">Doctor</div><div class="value" id="patientDoctor">—</div></div>
+          <div><div class="label">Diagnosis</div><div class="value" id="patientDiagnosis">—</div></div>
+        </div>
+
+        <div class="action-row">
+          <select class="lang-select" id="langSelect">
+            <option value="">Auto-detect language</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="pa">Punjabi</option>
+            <option value="ta">Tamil</option>
+            <option value="te">Telugu</option>
+            <option value="bn">Bengali</option>
+          </select>
+          <button class="btn primary" id="recordBtn">🎤 Record Handoff</button>
+        </div>
+        <div id="status"></div>
+      </div>
+
+      <div class="section-title" id="liveTitle" style="display:none;">New handoff (edit before saving)</div>
+      <div class="card" id="liveCard" style="display:none;">
+        <textarea class="transcript-edit" id="liveTranscript"></textarea>
+        <div class="action-row" style="margin-top:14px;">
+          <button class="btn primary small" id="saveBtn">Save to history</button>
+          <button class="btn secondary small" id="copyBtn">Copy</button>
+        </div>
+      </div>
+
+      <div class="section-title">Handoff history</div>
+      <div class="card" id="historyCard">
+        <div class="history-empty">No saved handoffs yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+
+    const PATIENTS = {
+      "john-smith": { name: "John Smith", age: 64, ward: "ICU", doctor: "Dr. Williams", diagnosis: "Pneumonia", risk: "high", riskLabel: "HIGH RISK" },
+      "emily-brown": { name: "Emily Brown", age: 45, ward: "Ward 3", doctor: "Dr. Patel", diagnosis: "Post-op recovery", risk: "stable", riskLabel: "STABLE" },
+      "michael-lee": { name: "Michael Lee", age: 58, ward: "Ward 5", doctor: "Dr. Chen", diagnosis: "Observation", risk: "pending", riskLabel: "PENDING HANDOFF" },
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const patientId = PATIENTS[params.get('id')] ? params.get('id') : 'john-smith';
+    const patient = PATIENTS[patientId];
+    const historyKey = `nursesync_handoffs_${patientId}`;
+
+    document.getElementById('patientName').textContent = patient.name;
+    document.getElementById('patientBadge').textContent = patient.riskLabel;
+    document.getElementById('patientBadge').classList.add(patient.risk);
+    document.getElementById('patientAge').textContent = patient.age;
+    document.getElementById('patientWard').textContent = patient.ward;
+    document.getElementById('patientDoctor').textContent = patient.doctor;
+    document.getElementById('patientDiagnosis').textContent = patient.diagnosis;
+
+    let mediaRecorder = null;
+    let chunks = [];
+    let recording = false;
+    let lastLanguage = '';
+
+    const recordBtn = document.getElementById('recordBtn');
+    const statusEl = document.getElementById('status');
+    const liveTitle = document.getElementById('liveTitle');
+    const liveCard = document.getElementById('liveCard');
+    const liveTranscript = document.getElementById('liveTranscript');
+    const langSelect = document.getElementById('langSelect');
+
+    function setStatus(text, isError) {
+      statusEl.textContent = text || '';
+      statusEl.style.color = isError ? '#e0405a' : '#6b8177';
+    }
+
+    function loadHistory() {
+      const raw = localStorage.getItem(historyKey);
+      let items = [];
+      try { items = raw ? JSON.parse(raw) : []; } catch (e) { items = []; }
+      items.sort((a, b) => b.timestamp - a.timestamp);
+
+      const el = document.getElementById('historyCard');
+      if (items.length === 0) {
+        el.innerHTML = '<div class="history-empty">No saved handoffs yet.</div>';
+        return;
+      }
+      el.innerHTML = items.map((h) => `
+        <div class="history-item">
+          <div class="meta">
+            <span>${new Date(h.timestamp).toLocaleString()}</span>
+            <span class="lang-tag">${h.language || 'auto'}</span>
+          </div>
+          <div>${h.text.replace(/</g, '&lt;')}</div>
+        </div>
+      `).join('');
+    }
+
+    function saveToHistory(text, language) {
+      const raw = localStorage.getItem(historyKey);
+      let items = [];
+      try { items = raw ? JSON.parse(raw) : []; } catch (e) { items = []; }
+      items.push({ text, language, timestamp: Date.now() });
+      localStorage.setItem(historyKey, JSON.stringify(items));
+      loadHistory();
+    }
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        chunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = handleStop;
+        mediaRecorder.start();
+        recording = true;
+        lastLanguage = langSelect.value;
+        recordBtn.textContent = '⏹ Stop Recording';
+        recordBtn.classList.add('recording');
+        setStatus('Recording… speak the handoff, then click Stop.');
+      } catch (err) {
+        setStatus('Microphone access denied or unavailable.', true);
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && recording) {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        recording = false;
+        recordBtn.textContent = '🎤 Record Handoff';
+        recordBtn.classList.remove('recording');
+      }
+    }
+
+    async function handleStop() {
+      setStatus('Transcribing…');
+      const blob = new Blob(chunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', blob, 'handoff.webm');
+      if (lastLanguage) formData.append('language', lastLanguage);
+
+      try {
+        const res = await fetch(`${API_BASE}/transcribe`, { method: 'POST', body: formData });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `server returned ${res.status}`);
+        }
+        const data = await res.json();
+        liveTitle.style.display = 'block';
+        liveCard.style.display = 'block';
+        liveTranscript.value = data.transcript;
+        liveTranscript.dataset.language = lastLanguage || (data.detected_language || '');
+        setStatus('Transcribed — review/edit below, then save.');
+      } catch (err) {
+        setStatus(`Transcription failed: ${err.message}`, true);
+      }
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const text = liveTranscript.value.trim();
+      if (!text) return;
+      saveToHistory(text, liveTranscript.dataset.language || lastLanguage);
+      liveTitle.style.display = 'none';
+      liveCard.style.display = 'none';
+      liveTranscript.value = '';
+      setStatus('Saved to handoff history.');
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(liveTranscript.value);
+        setStatus('Copied to clipboard.');
+      } catch (e) {
+        setStatus('Could not copy — select and copy manually.', true);
+      }
+    });
+
+    recordBtn.addEventListener('click', () => {
+      if (!recording) startRecording();
+      else stopRecording();
+    });
+
+    loadHistory();
+  </script>
+</body>
+</html>
